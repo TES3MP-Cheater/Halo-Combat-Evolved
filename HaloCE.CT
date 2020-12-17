@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="31">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>1</ID>
+      <Description>"Bottomless Clip"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+add [esi+08],(int)1
+
+originalcode:
+//mov [esi+08],ax
+jg halo.exe+C40A8
+
+exit:
+jmp returnhere
+
+"halo.exe"+C4096:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+C4096:
+mov [esi+08],ax
+jg halo.exe+C40A8
+//Alt: db 66 89 46 08 7F 0C
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>3</ID>
+      <Description>"Infinite Grenades"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+add [eax+edi+31E],01
+
+originalcode:
+//dec [eax+edi+0000031E]
+
+exit:
+jmp returnhere
+
+"halo.exe"+16E314:
+jmp newmem
+nop 2
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+16E314:
+dec [eax+edi+0000031E]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>5</ID>
+      <Description>"Infinite Shields"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+aobscanmodule(SHIELDS,halo.exe,75 1C 66 8B 86 06 01 00 00) // should be unique
+alloc(newmem,$1000)
+
+label(code)
+label(return)
+
+newmem:
+  jne SHIELDS+31
+    cmp [esi+C0],EC700000
+  jne code
+    cmp [esi+B8],FFFF0001
+  je SHIELDS+31
+  jmp return
+
+code:
+  mov ax,[esi+00000106]
+  jmp return
+
+SHIELDS:
+  jmp newmem
+  nop
+  nop
+  nop
+  nop
+return:
+registersymbol(SHIELDS)
+
+aobscanmodule(SHIELDED,halo.exe,75 0A C7 86 E4 00 00 00 00 00 00 00) // should be unique
+alloc(newmemr,$1000)
+
+label(coder)
+label(returnr)
+
+newmemr:
+  jne SHIELDED+13
+      cmp [esi+C0],EC700000
+  jne coder
+    cmp [esi+B8],FFFF0001
+    je SHIELDED+13
+    jmp returnr
+
+coder:
+  mov [esi+000000E4],00000000
+  jmp returnr
+
+SHIELDED:
+  jmp newmemr
+  nop
+  nop
+  nop
+  nop
+  nop
+  nop
+  nop
+returnr:
+registersymbol(SHIELDED)
+
+[DISABLE]
+
+SHIELDS:
+  db 75 1C 66 8B 86 06 01 00 00
+
+unregistersymbol(SHIELDS)
+dealloc(newmem)
+
+SHIELDED:
+  db 75 0A C7 86 E4 00 00 00 00 00 00 00
+
+unregistersymbol(SHIELDED)
+dealloc(newmemr)
+
+{
+// ORIGINAL CODE - INJECTION POINT: "halo.exe"+EFBE6
+
+"halo.exe"+EFBC7: D9 54 24 20           -  fst dword ptr [esp+20]
+"halo.exe"+EFBCB: D8 9E E4 00 00 00     -  fcomp dword ptr [esi+000000E4]
+"halo.exe"+EFBD1: DF E0                 -  fnstsw ax
+"halo.exe"+EFBD3: F6 C4 41              -  test ah,41
+"halo.exe"+EFBD6: 74 64                 -  je halo.exe+EFC3C
+"halo.exe"+EFBD8: 66 83 39 03           -  cmp word ptr [ecx],03
+"halo.exe"+EFBDC: 74 5E                 -  je halo.exe+EFC3C
+"halo.exe"+EFBDE: 8A 44 24 44           -  mov al,[esp+44]
+"halo.exe"+EFBE2: DD D8                 -  fstp st(0)
+"halo.exe"+EFBE4: 3C 01                 -  cmp al,01
+// ---------- INJECTING HERE ----------
+"halo.exe"+EFBE6: 75 1C                 -  jne halo.exe+EFC04
+"halo.exe"+EFBE8: 66 8B 86 06 01 00 00  -  mov ax,[esi+00000106]
+// ---------- DONE INJECTING  ----------
+"halo.exe"+EFBEF: F6 C4 08              -  test ah,08
+"halo.exe"+EFBF2: 75 10                 -  jne halo.exe+EFC04
+"halo.exe"+EFBF4: D9 86 E4 00 00 00     -  fld dword ptr [esi+000000E4]
+"halo.exe"+EFBFA: D8 64 24 20           -  fsub dword ptr [esp+20]
+"halo.exe"+EFBFE: D9 9E E4 00 00 00     -  fstp dword ptr [esi+000000E4]
+"halo.exe"+EFC04: F6 86 06 01 00 00 02  -  test byte ptr [esi+00000106],02
+"halo.exe"+EFC0B: 0F 85 8B 00 00 00     -  jne halo.exe+EFC9C
+"halo.exe"+EFC11: D9 86 E4 00 00 00     -  fld dword ptr [esi+000000E4]
+"halo.exe"+EFC17: D8 9F 84 01 00 00     -  fcomp dword ptr [edi+00000184]
+"halo.exe"+EFC1D: DF E0                 -  fnstsw ax
+}
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>6</ID>
+      <Description>"Infinite Health"</Description>
+      <LastState Activated="1"/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov dword ptr [esi+E0],(float)100
+
+originalcode:
+//fstp dword ptr [esi+000000E0]
+
+exit:
+jmp returnhere
+
+"halo.exe"+EF49F:
+jmp newmem
+nop
+returnhere:
+
+
+
+
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+EF49F:
+fstp dword ptr [esi+000000E0]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>7</ID>
+      <Description>"No description"</Description>
+      <VariableType>Byte</VariableType>
+      <Address>400008CC</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>8</ID>
+      <Description>"1"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov [esi+ebx],(int)1
+
+
+originalcode:
+//mov [esi+ebx*4],eax
+//mov eax,[esp+6C]
+
+exit:
+jmp returnhere
+
+"halo.exe"+B1DA1:
+jmp newmem
+nop 2
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+B1DA1:
+mov [esi+ebx*4],eax
+mov eax,[esp+6C]
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>9</ID>
+      <Description>"2"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+add eax,(int)1
+
+
+originalcode:
+//mov eax,[edx]
+//xor ebx,ebx
+//test eax,eax
+
+exit:
+jmp returnhere
+
+"halo.exe"+B2FB2:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+B2FB2:
+mov eax,[edx]
+xor ebx,ebx
+test eax,eax
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>10</ID>
+      <Description>"Zoom 0-2"</Description>
+      <VariableType>Byte</VariableType>
+      <Address>400008D0</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>11</ID>
+      <Description>"ecx,edx"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov ecx,[edx+04](int)1
+
+
+originalcode:
+//mov ecx,[edx+04]
+//test ecx,ecx
+
+exit:
+jmp returnhere
+
+"halo.exe"+B2F11:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+B2F11:
+mov ecx,[edx+04]
+test ecx,ecx
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>12</ID>
+      <Description>"esi,ebx"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov [esi+ebx*4],(int)1
+
+
+originalcode:
+//mov [esi+ebx*4],ecx
+jmp halo.exe+B1DA4
+
+exit:
+jmp returnhere
+
+"halo.exe"+B1D99:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+B1D99:
+mov [esi+ebx*4],ecx
+jmp halo.exe+B1DA4
+
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>13</ID>
+      <Description>"bx,[ecx]"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov bx,[ecx](int)1
+
+
+originalcode:
+//mov bx,[ecx]
+//mov edx,eax
+
+exit:
+jmp returnhere
+
+"halo.exe"+B2FF5:
+jmp newmem
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+
+dealloc(newmem)
+"halo.exe"+B2FF5:
+mov bx,[ecx]
+mov edx,eax
+//Alt: db 66 8B 19 8B D0
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>16</ID>
+      <Description>"Ghost1"</Description>
+      <VariableType>Byte</VariableType>
+      <Address>halo.exe+32E288</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>17</ID>
+      <Description>"Ghost2"</Description>
+      <VariableType>Byte</VariableType>
+      <Address>halo.exe+32E900</Address>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>18</ID>
+      <Description>"Auto Assemble script"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+mov [esi+08],(int)1
+
+
+originalcode:
+//mov [esi+08],bl
+pop esi
+mov al,01
+
+exit:
+jmp returnhere
+
+"halo.exe"+148028:
+jmp newmem
+nop
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"halo.exe"+148028:
+mov [esi+08],bl
+pop esi
+mov al,01
+//Alt: db 88 5E 08 5E B0 01
+</AssemblerScript>
+    </CheatEntry>
+    <CheatEntry>
+      <ID>26</ID>
+      <Description>"Fall through ground"</Description>
+      <LastState/>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>[ENABLE]
+//code from here to '[DISABLE]' will be used to enable the cheat
+alloc(newmem,2048)
+label(returnhere)
+label(originalcode)
+label(exit)
+
+newmem:
+add dword ptr [esp+14],(float)0
+
+
+originalcode:
+//fstp dword ptr [esp+14]
+fcom dword ptr [halo.exe+272AC0]
+
+exit:
+jmp returnhere
+
+"halo.exe"+1021BB:
+jmp newmem
+nop 5
+returnhere:
+
+
+ 
+ 
+[DISABLE]
+//code from here till the end of the code will be used to disable the cheat
+dealloc(newmem)
+"halo.exe"+1021BB:
+fstp dword ptr [esp+14]
+fcom dword ptr [halo.exe+272AC0]
+//Alt: db D9 5C 24 14 D8 15 C0 2A 67 00
+</AssemblerScript>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+</CheatTable>
